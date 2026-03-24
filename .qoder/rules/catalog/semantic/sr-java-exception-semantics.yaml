@@ -1,0 +1,61 @@
+schema_version: v1
+id: SR-JAVA-EXCEPTION-001
+title: Exception handling 必须保留 business meaning、rollback intent 与 caller contract
+summary: >
+  Java 与 Spring 的 exception flow 应清楚区分 business rejection 与 system failure，
+  明确日志边界，并保证 caller 收到稳定 contract。`catch-and-wrap` 或 swallow 模式
+  不能抹掉 operation 或 domain 语义。
+owner: review-governance@team
+status: active
+category: semantic-review
+severity: critical
+profile_tags:
+  - spring
+  - layered-service
+  - sofa
+applies_to:
+  languages: [java]
+  frameworks: [spring, sofa]
+  module_patterns:
+    - "*"
+  paths:
+    - "**/*.java"
+  package_patterns:
+    - "..exception.."
+    - "..advice.."
+    - "..service.."
+    - "..facade.."
+review:
+  objective: 防止 exception handling 隐藏 failure semantics，或导致 rollback 行为不一致。
+  checklist:
+    - 上游 caller 能区分 business exception 与 infrastructure failure。
+    - Catch block 要么增加 actionable context，要么转换为更精确的 contract，而不是盲目 rewrap。
+    - Logging 只在合适 boundary 发生一次，而不是跨层重复打印 stack trace。
+    - Transaction rollback intent 与最终抛出的 exception type 保持一致。
+  positive_indicators:
+    - Service 代码抛出带稳定 error code 或明确含义的 typed business exception。
+    - Transport boundary 会把 exception 映射为 caller contract，而不是泄漏内部 stack 细节。
+  anti_patterns:
+    - "`catch (Exception)` 后直接 generic runtime wrapping，且没有新增语义。"
+    - 吞掉 exception，并返回 success-like default，从而掩盖 partial failure。
+    - 在每一层都对同一个 exception logging 后再 rethrow。
+    - 把 domain rejection 翻译成面向 caller 的 generic system error。
+  comment_contract: >
+    Finding 必须解释丢失的语义或 rollback 不一致，而不是只指出存在 catch block。
+    如果没有影响 caller contract 或 transaction 语义，就不要过度评论。
+prompt_hints:
+  load_by_default: true
+  load_when:
+    scopes: [review-diff, review-file, review-module]
+    objectives: [exception, error-handling, rollback]
+  max_context_lines: 120
+  prefer_when_profiles: [layered-service]
+governance:
+  admission_decision: keep-in-semantic-review
+  rationale: Exception semantics 的正确性依赖 intent、contract 与 boundary placement。
+  evidence_required:
+    - 需要能区分 business rejection 与 system failure 的 failure scenario 证据。
+  conflicts_with: []
+  supersedes: []
+  related_rules:
+    - SR-JAVA-SOFA-BOUNDARY-001

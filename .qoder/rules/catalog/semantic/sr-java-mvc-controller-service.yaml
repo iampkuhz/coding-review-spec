@@ -1,0 +1,62 @@
+schema_version: v1
+id: SR-JAVA-MVC-CTRL-001
+title: Controller 应保持薄层，只负责把 orchestration 委托给 service 或 application boundary
+summary: >
+  Spring MVC controller 与面向 SOFA 的 adapter 应专注于 transport mapping、validation handoff、
+  response shaping，不应堆积本应属于 service 或 application 的 branching business logic、
+  persistence 调用和 transaction 决策。
+owner: review-governance@team
+status: active
+category: semantic-review
+severity: major
+profile_tags:
+  - mvc
+  - layered-service
+  - spring
+applies_to:
+  languages: [java]
+  frameworks: [spring, sofa]
+  module_patterns:
+    - "*-web"
+    - "*-api"
+    - "*-adapter"
+  paths:
+    - "**/*Controller.java"
+    - "**/*Facade.java"
+    - "**/controller/**/*.java"
+    - "**/facade/**/*.java"
+  package_patterns:
+    - "..controller.."
+    - "..facade.."
+review:
+  objective: 防止 transport layer 代码演化成第二套 service layer。
+  checklist:
+    - Controller method 通过清晰的 application 或 service boundary 做协调。
+    - HTTP 或 RPC concern 与 branching business decision 保持分离。
+    - Transaction、persistence、跨 aggregate 决策向下委托。
+  positive_indicators:
+    - Controller 代码主要负责 request/response mapping，并调用一次明确的 service。
+    - Validation 与 authorization 在 service delegation 前完成，但不嵌入业务 workflow。
+  anti_patterns:
+    - Controller 代码循环调用 repository，或在本层直接构造 domain decision。
+    - Controller 通过捕获 generic exception 来模拟业务分支。
+    - Controller method 持有应属于 service 的 transaction 或 persistence coupling。
+  comment_contract: >
+    只有当 controller complexity 改变了业务行为的 ownership 时才评论，而不是因为 method 变长。
+    每条 finding 都要指向职责错位和其带来的下游风险。
+prompt_hints:
+  load_by_default: true
+  load_when:
+    scopes: [review-diff, review-file, review-module]
+    objectives: [controller, mvc, spring-layering]
+  max_context_lines: 100
+  prefer_when_profiles: [mvc, layered-service]
+governance:
+  admission_decision: keep-in-semantic-review
+  rationale: Controller 是否“薄”是语义问题，取决于行为 ownership，而不只是 package name。
+  evidence_required:
+    - 需要提供业务分支下沉到 controller 后引入 bug 或重复校验的例子。
+  conflicts_with: []
+  supersedes: []
+  related_rules:
+    - DC-JAVA-SPRING-LAYER-001

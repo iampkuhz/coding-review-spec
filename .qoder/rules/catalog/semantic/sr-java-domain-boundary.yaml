@@ -1,0 +1,62 @@
+schema_version: v1
+id: SR-JAVA-DOMAIN-BOUNDARY-001
+title: Domain logic 应留在 domain 或 application boundary 内，而不是漂移到 adapter
+summary: >
+  在 DDD 风格 module 中，domain invariant、aggregate state transition 与 business rule
+  应位于 domain 或 application layer。Adapter、controller、persistence helper 不应成为
+  domain behavior 的真实 owner。
+owner: review-governance@team
+status: active
+category: semantic-review
+severity: major
+profile_tags:
+  - ddd
+  - layered-service
+  - spring
+applies_to:
+  languages: [java]
+  frameworks: [spring]
+  module_patterns:
+    - "*-domain"
+    - "*-application"
+    - "*-service"
+    - "*-adapter"
+  paths:
+    - "**/*.java"
+  package_patterns:
+    - "..domain.."
+    - "..application.."
+    - "..service.."
+    - "..adapter.."
+review:
+  objective: 让 invariant 与 state transition 留在可推理、可复用、可演进的边界中。
+  checklist:
+    - Aggregate 或 domain rule 在稳定的 domain 或 application entry point 中被执行。
+    - Adapter 与 repository 不会悄悄决定业务结果。
+    - 新增 domain behavior 不会被拆散到 controller、scheduled job、mapper 中。
+  positive_indicators:
+    - Business rule 可在内聚的 domain 或 application service 中被发现。
+    - 外部 adapter 只负责 command/response translation，而不持有 invariant。
+  anti_patterns:
+    - Mapper 或 repository 代码决定 domain transition 或 business rejection logic。
+    - Controller 或 event listener 重复实现 aggregate invariant。
+    - Entity update 依赖 caller 自律，而不是显式的 domain operation。
+  comment_contract: >
+    只有当变更中真实出现了 domain ownership 问题时才使用这条规则。
+    如果 module 明显是非 DDD 的 layered-service 代码，应优先使用 layering 或 persistence 规则。
+prompt_hints:
+  load_by_default: false
+  load_when:
+    scopes: [review-diff, review-file, review-module, review-architecture]
+    objectives: [domain, aggregate, ddd]
+  max_context_lines: 120
+  prefer_when_profiles: [ddd]
+governance:
+  admission_decision: keep-in-semantic-review
+  rationale: Domain ownership 需要对 intent 做判断，不能简化成 package name 匹配。
+  evidence_required:
+    - 需要提供一个会被该变更削弱的具体 domain invariant 或 aggregate rule。
+  conflicts_with: []
+  supersedes: []
+  related_rules:
+    - SR-JAVA-PERSISTENCE-001

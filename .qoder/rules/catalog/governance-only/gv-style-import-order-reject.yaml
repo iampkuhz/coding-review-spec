@@ -1,0 +1,59 @@
+schema_version: v1
+id: GV-CODESTYLE-IMPORT-001
+title: Import order 与其他纯 style 检查必须排除在 semantic review 之外
+summary: >
+  能被 deterministic style check 完整表达的规则，不应消耗 semantic review budget。
+  Import ordering、whitespace、brace placement 及类似的纯 style 问题，应进入 Checkstyle
+  或 formatter，而不是进入 Qoder review prompt。
+owner: review-governance@team
+status: active
+category: governance-only
+severity: info
+profile_tags:
+  - mvc
+  - ddd
+  - layered-service
+  - spring
+  - sofa
+applies_to:
+  languages: [java]
+  frameworks: [spring, sofa]
+  module_patterns:
+    - "*"
+  paths:
+    - "**/*.java"
+  package_patterns: []
+review:
+  objective: 保持 semantic rule catalog 聚焦于 behavior、ownership 与 architecture。
+  checklist:
+    - 拒绝那些可以由 formatter、Checkstyle、import-order checker 覆盖的规则。
+    - 拒绝那些唯一价值只是维持视觉一致性的规则。
+  positive_indicators:
+    - 团队会把纯 style concern 路由到 deterministic tooling 或 IDE formatting。
+  anti_patterns:
+    - 为 import group、blank line、brace placement 新增 semantic review rule。
+    - 要求 review skill 对低信号的 style noise 做评论。
+  comment_contract: >
+    不要把这条规则当作针对业务代码的 code review finding。
+    它只用于 rule admission 与 governance discussion。
+prompt_hints:
+  load_by_default: false
+  load_when:
+    scopes: [rule-add, rule-validate, rule-explain]
+    objectives: [governance, admission, rejection]
+  max_context_lines: 60
+  prefer_when_profiles: []
+deterministic:
+  target_engine: checkstyle
+  migration_readiness: ready
+  suggested_artifact: config/checkstyle/import-order.xml
+  detection_strategy: 用 Checkstyle import ordering 与 formatter rule 替代 LLM review。
+governance:
+  admission_decision: reject-from-semantic-review
+  rationale: 纯 style 规则噪音高、deterministic 强，不应占用 semantic review budget。
+  evidence_required:
+    - 需要证明该提案除了 formatting 之外，不涉及 behavior、contract、architecture 或其他语义价值。
+  conflicts_with: []
+  supersedes: []
+  related_rules:
+    - DC-JAVA-SPRING-LAYER-001

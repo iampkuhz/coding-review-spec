@@ -1,0 +1,66 @@
+schema_version: v1
+id: SR-JAVA-SOFA-BOUNDARY-001
+title: SOFA service boundary 应暴露稳定 facade contract，并避免内部 model 泄漏
+summary: >
+  SOFA provider 与 consumer 应通过稳定的 facade DTO、显式的 error semantics、
+  以及可容忍版本变化的 contract 交互。内部 domain entity、persistence model、
+  framework-specific exception 不应穿透 RPC boundary。
+owner: review-governance@team
+status: active
+category: semantic-review
+severity: critical
+profile_tags:
+  - sofa
+  - layered-service
+  - multi-module
+applies_to:
+  languages: [java]
+  frameworks: [sofa, spring]
+  module_patterns:
+    - "*-facade"
+    - "*-provider"
+    - "*-consumer"
+    - "*-api"
+  paths:
+    - "**/*Facade.java"
+    - "**/*Provider.java"
+    - "**/*Consumer.java"
+    - "**/facade/**/*.java"
+    - "**/provider/**/*.java"
+    - "**/consumer/**/*.java"
+  package_patterns:
+    - "..facade.."
+    - "..provider.."
+    - "..consumer.."
+review:
+  objective: 保持 SOFA RPC boundary 稳定、transport-safe，并与内部 model 解耦。
+  checklist:
+    - RPC DTO 与返回 envelope 以跨 module 兼容性为目标设计，而不是复用内部 entity。
+    - Provider implementation 不会通过 facade contract 直接泄漏 persistence、web、domain internals。
+    - Consumer 代码把 remote error 视为 remote contract outcome，而不是本地实现异常。
+  positive_indicators:
+    - Facade interface 使用专门的 request/response model，并明确 versioning expectation。
+    - Provider adapter 会在跨越 RPC boundary 前转换内部 exception 与 model。
+  anti_patterns:
+    - 直接复用 JPA entity、MyBatis record 或 aggregate internals 作为 SOFA DTO。
+    - 让 framework-specific unchecked exception 直接穿过 facade layer。
+    - Consumer 代码基于 provider implementation detail 或具体 exception class 做分支。
+  comment_contract: >
+    只有当变更影响 contract stability、compatibility 或 failure semantics ownership 时才提出 finding。
+    不要纠结命名或 packaging，除非它已经泄漏内部实现细节。
+prompt_hints:
+  load_by_default: true
+  load_when:
+    scopes: [review-diff, review-file, review-module, review-architecture]
+    objectives: [sofa, facade, rpc-boundary]
+  max_context_lines: 120
+  prefer_when_profiles: [layered-service]
+governance:
+  admission_decision: keep-in-semantic-review
+  rationale: SOFA boundary 质量属于语义问题，需要 caller/provider contract judgment。
+  evidence_required:
+    - 需要能证明 DTO 或 exception 泄漏导致跨 module 耦合的 boundary 例子。
+  conflicts_with: []
+  supersedes: []
+  related_rules:
+    - SR-JAVA-EXCEPTION-001

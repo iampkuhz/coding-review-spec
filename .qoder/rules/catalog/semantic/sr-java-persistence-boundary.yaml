@@ -1,0 +1,69 @@
+schema_version: v1
+id: SR-JAVA-PERSISTENCE-001
+title: Repository 与 persistence boundary 不应向上泄漏 ORM 或 mapper 细节
+summary: >
+  Repository API 应保持 service-layer 语义，不应把 persistence entity、mapper DTO、
+  framework-specific query object 或 partial update 语义泄漏到更高层。
+owner: review-governance@team
+status: active
+category: semantic-review
+severity: major
+profile_tags:
+  - layered-service
+  - ddd
+  - spring
+  - multi-module
+applies_to:
+  languages: [java]
+  frameworks: [spring]
+  module_patterns:
+    - "*-repository"
+    - "*-repo"
+    - "*-infra"
+    - "*-persistence"
+    - "*-service"
+  paths:
+    - "**/*Repository.java"
+    - "**/*Dao.java"
+    - "**/*Mapper.java"
+    - "**/repository/**/*.java"
+    - "**/dao/**/*.java"
+    - "**/mapper/**/*.java"
+    - "**/service/**/*.java"
+  package_patterns:
+    - "..repository.."
+    - "..dao.."
+    - "..mapper.."
+    - "..service.."
+review:
+  objective: 保持面向 service 的 persistence contract 稳定，尤其是操作语义与返回数据语义。
+  checklist:
+    - Repository 暴露的是具备 domain 含义的操作，而不是裸表操作或 mapper 细节。
+    - Service 代码不依赖 persistence entity、query wrapper 或 mapper 的返回约定。
+    - Partial update 与 batch write 会把 invariant 显式化，而不是藏进 generic method。
+  positive_indicators:
+    - Repository method 返回带有明确 lifecycle 含义的 domain 或 application-level object。
+    - Persistence-specific optimization 留在 infrastructure 代码中，不改变 service contract。
+  anti_patterns:
+    - Service 代码在 persistence boundary 之外直接操作 JPA entity 或 MyBatis record。
+    - Repository method 从 service 接收 generic map、query wrapper 或 raw SQL fragment。
+    - Mapper DTO 或 persistence entity 被复用为外部 API payload。
+  comment_contract: >
+    只有当 persistence 细节泄漏到 service 行为或 public contract 时才提出 finding。
+    不要对纯 style 问题发表评论，除非它掩盖了真实的语义泄漏。
+prompt_hints:
+  load_by_default: true
+  load_when:
+    scopes: [review-diff, review-file, review-module]
+    objectives: [persistence, repository, data-access]
+  max_context_lines: 120
+  prefer_when_profiles: [ddd, layered-service]
+governance:
+  admission_decision: keep-in-semantic-review
+  rationale: Persistence leakage 依赖业务含义判断，不能被简单 naming rule 完整覆盖。
+  evidence_required:
+    - 至少提供一个 persistence model 泄漏导致耦合或 contract 混乱的例子。
+  conflicts_with: []
+  supersedes: []
+  related_rules:
+    - SR-JAVA-DOMAIN-BOUNDARY-001

@@ -1,0 +1,77 @@
+schema_version: v1
+id: DC-JAVA-SPRING-LAYER-001
+title: Web、application、persistence package 必须保持单向依赖流
+summary: >
+  Controller、facade、adapter 代码不应绕过 service 或 application boundary，
+  直接调用 repository、mapper、DAO。对这类稳定的 package 和 module boundary，
+  应优先迁移到 ArchUnit，而不是长期留在 semantic review 中。
+owner: review-governance@team
+status: active
+category: deterministic-candidate
+severity: major
+profile_tags:
+  - mvc
+  - layered-service
+  - spring
+  - multi-module
+applies_to:
+  languages: [java]
+  frameworks: [spring]
+  module_patterns:
+    - "*-web"
+    - "*-api"
+    - "*-application"
+    - "*-service"
+    - "*-repo"
+    - "*-repository"
+    - "*-infra"
+  paths:
+    - "**/*.java"
+  package_patterns:
+    - "..controller.."
+    - "..facade.."
+    - "..service.."
+    - "..application.."
+    - "..repository.."
+    - "..dao.."
+    - "..mapper.."
+review:
+  objective: 识别会绕过 orchestration、validation、transaction boundary 的 layer bypass。
+  checklist:
+    - Controller 与 facade 代码依赖 application 或 service entry point，而不是 repository 或 mapper。
+    - Service 或 application 代码不会为了内部 orchestration 去依赖 controller-layer DTO。
+    - Persistence implementation 保持在 repository 或 gateway abstraction 后面。
+  positive_indicators:
+    - HTTP 或 RPC adapter 以 application service 或 facade 作为第一个业务 boundary。
+    - Repository 与 mapper 类型留在 persistence 或 infrastructure module 中。
+  anti_patterns:
+    - Controller 直接注入 `*Repository`、`*Mapper` 或 `*Dao`。
+    - Application logic 直接 import `web`、`controller`、`adapter` package 下的类型。
+    - 因为 layer boundary 被绕过，service 直接返回 persistence entity。
+  comment_contract: >
+    只有当 bypass 真实改变了行为或明显削弱了 boundary 时才提出 review comment。
+    否则应把它视为 deterministic candidate，并路由到 ArchUnit。
+prompt_hints:
+  load_by_default: false
+  load_when:
+    scopes: [review-diff, review-module, review-architecture]
+    objectives: [architecture, layering, module-boundary]
+  max_context_lines: 120
+  prefer_when_profiles: [mvc, layered-service]
+deterministic:
+  target_engine: archunit
+  migration_readiness: ready
+  suggested_artifact: src/test/java/.../LayerDependencyArchTest.java
+  detection_strategy: >
+    用 ArchUnit 明确允许的 package dependency，并禁止 controller 或 facade package
+    import repository、mapper、DAO package。
+governance:
+  admission_decision: migrate-to-deterministic
+  rationale: 稳定的 package dependency 更适合由 ArchUnit 低成本执行，放进 prompt 只会制造噪音。
+  evidence_required:
+    - 服务之间的 package 或 module 命名已经足够稳定。
+    - 团队已经统一 controller、service、application、repository、infra 等 layer 名称。
+  conflicts_with: []
+  supersedes: []
+  related_rules:
+    - SR-JAVA-MVC-CTRL-001
