@@ -13,7 +13,7 @@ import yaml
 
 
 ROOT = Path(__file__).resolve().parents[2]
-RULE_DIR = ROOT / ".qoder" / "rules" / "catalog"
+RULE_DIR = ROOT / "rules" / "catalog"
 
 REQUIRED_TOP_LEVEL = {
     "schema_version",

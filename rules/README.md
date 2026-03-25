@@ -1,6 +1,6 @@
 # Qoder Review Rules 说明
 
-这个目录是 Qoder 的项目级 review rule catalog。
+这个目录是项目级的 review rule catalog。
 
 ## 目标
 

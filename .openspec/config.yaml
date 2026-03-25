@@ -1,7 +1,7 @@
 version: 1
 project: qoder-java-review-governance
-catalog_root: .qoder/rules/catalog
-schema_path: .qoder/rules/review-rule-schema.yaml
+catalog_root: rules/catalog
+schema_path: rules/review-rule-schema.yaml
 change_root: .openspec/changes
 templates:
   rule_proposal: .openspec/templates/rule-proposal.md
