@@ -1,0 +1,69 @@
+schema_version: v1
+id: SR-HARNESS-CONFIG-004
+title: Harness Engineering 项目必须包含 .agent/ 配置目录
+summary: >
+  Harness Engineering 项目必须在根目录包含 .agent/ 配置目录，
+  用于存放 Harness 核心配置（tool-profiles.json、plans、hooks 等）。
+owner: review-governance@team
+status: active
+category: semantic-review
+severity: critical
+profile_tags:
+  - harness-engineering
+  - project-structure
+  - agent-configuration
+applies_to:
+  languages:
+    - any
+  frameworks:
+    - any
+  paths:
+    - ".agent/**"
+  package_patterns:
+    - "**/*"
+review:
+  objective: 确保 Harness Engineering 项目具备完整的 Agent 配置
+  checklist:
+    - .agent/ 目录必须存在
+    - tool-profiles.json 必须存在（定义工具权限和任务剖面）
+    - plans/ 目录应该包含任务计划模板
+    - hooks/ 目录应该包含生命周期钩子脚本
+    - changelog.md 应该记录 Harness 自身变更记录
+  positive_indicators:
+    - .agent/ 目录结构完整
+    - tool-profiles.json 定义了清晰的工具权限
+    - plans/ 包含 add-feature.yaml、fix-bug.yaml 等标准流程
+    - hooks/ 包含 pre-commit.sh 等自动化脚本
+    - changelog.md 记录 Harness 规则迭代历史
+  anti_patterns:
+    - 缺失 .agent/ 目录
+    - 缺失 tool-profiles.json 核心配置文件
+    - plans/ 或 hooks/ 目录为空
+    - tool-profiles.json 允许危险命令（如 rm -rf、docker push）
+  comment_contract: >
+    如果项目缺失 .agent/ 或核心配置文件，必须指出这是 Harness Engineering 的核心要求。
+    如果 tool-profiles.json 允许危险命令，必须指出安全风险。
+prompt_hints:
+  load_by_default: true
+  load_when:
+    scopes:
+      - review-architecture
+      - review-security
+    objectives:
+      - project-structure
+      - harness-engineering
+governance:
+  admission_decision: keep-in-semantic-review
+  rationale: >
+    需要判断 .agent/ 配置是否完整、tool-profiles.json 的权限设置是否安全，
+    这需要理解 Harness Engineering 架构和最佳实践。
+  evidence_required:
+    - 检查 .agent/ 目录结构
+    - 检查 tool-profiles.json 内容
+    - 检查是否允许危险命令
+  conflicts_with: []
+  supersedes: []
+  related_rules:
+    - SR-HARNESS-ARCH-001
+    - SR-HARNESS-AGENT-002
+    - SR-HARNESS-DOCS-003

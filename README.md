@@ -8,13 +8,9 @@
 
 如果你想用这个仓库做自动 Java CR 助手，请参考：
 
-- 📘 [**用户操作手册**](docs/user-guide.md) - 如何发起审查、操作流程、完整示例
-- 📊 [**规则边界分析**](docs/review-governance/rule-boundary-analysis.md) - 哪些规则应该由工具处理，哪些应该由 LLM 处理
-
-### 核心文档
-
-- 📖 [**rule_tool.py 使用指南**](docs/rule-tool-guide.md) - 本地规则校验与选择工具详解
-- 💡 [**Rule 概念解析**](docs/rule-concept-explained.md) - Rule 是上下文还是规约？
+- 📘 [**用户手册**](handbook/user-manual.md) - 如何发起审查、操作流程、完整示例
+- 📗 [**规约管理指南**](handbook/governance-guide.md) - 如何管理和维护审查规约
+- 📙 [**规则边界分析**](harness/governance/docs/review-governance/rule-boundary-analysis.md) - 哪些规则应该由工具处理，哪些应该由 LLM 处理
 
 ---
 
@@ -26,8 +22,9 @@
 - `.qoder/commands/`：供 Qoder 直接调用的 review 与规则治理 commands
 - `.qoder/skills/`：按关注点拆分的 Java review skills，而不是单一的大 prompt
 - `.openspec/`：用于规则提案、准入、替代、废弃的 OpenSpec 治理模板
-- `tools/review/rule_tool.py`：本地可运行的规则校验、选择、解释工具
-- `docs/review-governance/`：使用与治理说明文档
+- `harness/review/rule_tool.py`：本地可运行的规则校验、选择、解释工具
+- `harness/governance/docs/review-governance/`：使用与治理说明文档（给大模型看）
+- `handbook/`：用户手册和管理指南（给人看）
 
 目录结构：
 
@@ -82,12 +79,18 @@
 │       │   └── SKILL.md                                # 技能定义文件
 │       └── java-review-spring-layering/                # 技能：Spring layering 审查
 │           └── SKILL.md                                # 技能定义文件
-├── docs/                                               # 项目文档目录
-│   └── review-governance/                              # 审查治理文档
-│       ├── README.md                                   # 治理文档索引
-│       ├── how-to-add-a-rule.md                        # 如何添加规则：完整流程指南
-│       ├── how-to-run-review.md                        # 如何运行 review：Qoder commands 使用说明
-│       └── rule-boundary-analysis.md                   # 规则边界分析：工具 vs LLM 的职责划分（重要）
+├── handbook/                                           # 给人看的文档
+│   ├── user-manual.md                                  # 用户手册
+│   └── governance-guide.md                             # 规约管理指南
+├── harness/                                            # Harness Engineering
+│   ├── harness.json                                    # Harness 配置
+│   ├── review/                                         # 代码审查执行器
+│   │   ├── harness.py                                  # 核心执行器
+│   │   └── rule_tool.py                                # 规则工具
+│   ├── rules/                                          # 审查规约目录
+│   └── governance/                                     # 规则治理层
+│       ├── openspec/                                   # OpenSpec 配置
+│       └── docs/                                       # 给大模型看的文档
 ├── tools/                                              # 本地工具脚本
 │   └── review/                                         # 审查相关工具
 │       ├── README.md                                   # 工具说明
@@ -99,18 +102,13 @@
 
 ### 面向用户
 
-- [**用户操作手册**](docs/user-guide.md) - 如何发起审查、操作流程、完整示例
-- [**如何运行 Review**](docs/review-governance/how-to-run-review.md) - Qoder commands 使用指南
+- [**用户手册**](handbook/user-manual.md) - 如何发起审查、操作流程、完整示例
+- [**规约管理指南**](handbook/governance-guide.md) - 如何管理和维护审查规约
 
 ### 面向规则治理
 
-- [**规则边界分析**](docs/review-governance/rule-boundary-analysis.md) - 工具 vs LLM 的职责划分
-- [**如何添加规则**](docs/review-governance/how-to-add-a-rule.md) - 规则提案和准入流程
-
-### 面向开发者
-
-- [**rule_tool.py 使用指南**](docs/rule-tool-guide.md) - 本地工具详解
-- [**Rule 概念解析**](docs/rule-concept-explained.md) - Rule 的本质和组织方式
+- [**规则边界分析**](harness/governance/docs/review-governance/rule-boundary-analysis.md) - 工具 vs LLM 的职责划分
+- [**如何添加规则**](harness/governance/docs/review-governance/how-to-add-a-rule.md) - 规则提案和准入流程
 
 ---
 
@@ -293,7 +291,7 @@
 快速验证：
 
 ```bash
-python3 tools/review/rule_tool.py validate --strict
-python3 tools/review/rule_tool.py select --scope review-diff --objective persistence --path src/main/java/com/example/order/OrderService.java
-python3 tools/review/rule_tool.py explain --rule SR-JAVA-PERSISTENCE-001
+python3 harness/review/rule_tool.py validate --strict
+python3 harness/review/rule_tool.py select --scope review-diff --objective persistence --path src/main/java/com/example/order/OrderService.java
+python3 harness/review/rule_tool.py explain --rule SR-JAVA-PERSISTENCE-001
 ```

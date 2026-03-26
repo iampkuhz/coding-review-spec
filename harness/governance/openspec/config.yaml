@@ -1,0 +1,17 @@
+version: 1
+project: qoder-java-review-governance
+catalog_root: harness/rules/catalog
+schema_path: harness/rules/review-rule-schema.yaml
+change_root: harness/governance/openspec/changes
+templates:
+  rule_proposal: harness/governance/openspec/templates/rule-proposal.md
+  rule_admission_review: harness/governance/openspec/templates/rule-admission-review.md
+  rule_deprecation: harness/governance/openspec/templates/rule-deprecation.md
+policies:
+  - harness/governance/openspec/policies/rule-admission-policy.md
+workflow:
+  require_proposal: true
+  require_admission_review: true
+  require_conflict_check: true
+  require_catalog_validation: true
+  allow_direct_activation_without_review: false

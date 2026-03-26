@@ -1,0 +1,70 @@
+schema_version: v1
+id: SR-HARNESS-ARCH-001
+title: Harness Engineering 项目必须包含 AGENTS.md 作为全局入口
+summary: >
+  Harness Engineering 项目必须在根目录包含 AGENTS.md 文件，
+  作为 Agent 的全局地图，包含项目概述、核心规则和架构约定。
+owner: review-governance@team
+status: active
+category: semantic-review
+severity: major
+profile_tags:
+  - harness-engineering
+  - project-structure
+  - agent-entry-point
+applies_to:
+  languages:
+    - typescript
+    - javascript
+    - java
+    - python
+  frameworks:
+    - any
+  paths:
+    - "**/AGENTS.md"
+  package_patterns:
+    - "**/*"
+review:
+  objective: 确保 Harness Engineering 项目具备清晰的全局入口文档
+  checklist:
+    - AGENTS.md 必须存在于项目根目录
+    - AGENTS.md 应该包含项目概述和架构描述
+    - AGENTS.md 应该指向 docs/agents/ 目录
+    - AGENTS.md 应该包含核心 Golden Rules
+    - AGENTS.md 长度应该控制在 50-100 行以内，避免上下文膨胀
+  positive_indicators:
+    - AGENTS.md 清晰描述项目架构
+    - AGENTS.md 提供指向详细文档的索引
+    - AGENTS.md 包含简洁的核心规则
+    - AGENTS.md 长度适中，易于阅读
+  anti_patterns:
+    - 缺失 AGENTS.md 文件
+    - AGENTS.md 超过 200 行，内容过于冗长
+    - AGENTS.md 只包含简单描述，没有架构约定
+    - AGENTS.md 没有指向 docs/agents/ 的详细文档
+  comment_contract: >
+    如果项目缺失 AGENTS.md，必须指出这是 Harness Engineering 项目的必要入口文件。
+    如果 AGENTS.md 过长，建议将详细规则移到 docs/agents/ 分层文档中。
+prompt_hints:
+  load_by_default: true
+  load_when:
+    scopes:
+      - review-architecture
+      - review-module
+    objectives:
+      - project-structure
+      - harness-engineering
+governance:
+  admission_decision: keep-in-semantic-review
+  rationale: >
+    需要判断 AGENTS.md 是否符合 Harness Engineering 规范，
+    包括内容结构、长度控制、是否指向分层文档等，这些需要语义理解。
+  evidence_required:
+    - 检查根目录是否存在 AGENTS.md
+    - 检查 AGENTS.md 内容结构
+    - 检查是否指向 docs/agents/
+  conflicts_with: []
+  supersedes: []
+  related_rules:
+    - SR-HARNESS-AGENT-002
+    - SR-HARNESS-DOCS-003

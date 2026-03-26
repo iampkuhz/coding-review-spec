@@ -1,0 +1,69 @@
+schema_version: v1
+id: SR-HARNESS-DOCS-003
+title: Harness Engineering 项目必须在 docs/agents/ 维护分层规范文档
+summary: >
+  Harness Engineering 项目必须在 docs/agents/ 目录下维护分层规范文档，
+  包括 architecture.md、backend.md、database.md 等，实现渐进式披露。
+owner: review-governance@team
+status: active
+category: semantic-review
+severity: major
+profile_tags:
+  - harness-engineering
+  - documentation
+  - layered-architecture
+applies_to:
+  languages:
+    - any
+  frameworks:
+    - any
+  paths:
+    - "docs/agents/**"
+  package_patterns:
+    - "**/*"
+review:
+  objective: 确保 Harness Engineering 项目具备分层文档结构
+  checklist:
+    - docs/agents/ 目录必须存在
+    - architecture.md 必须存在（整体架构规则）
+    - 根据项目类型，应该包含对应的规范文档（如 backend.md、database.md）
+    - 文档应该分层组织，避免单文件过长
+    - 文档应该与 AGENTS.md 中的索引对应
+  positive_indicators:
+    - docs/agents/ 包含完整的分层文档
+    - architecture.md 清晰描述分层约束和依赖方向
+    - backend.md 包含后端专属规范（API 路由、ORM 使用、文件组织）
+    - database.md 包含数据库迁移和操作规范
+    - testing.md 包含测试编写和覆盖规范
+  anti_patterns:
+    - 缺失 docs/agents/ 目录
+    - 缺失 architecture.md 核心文档
+    - 文档没有分层，所有内容塞在一个文件中
+    - 文档与 AGENTS.md 中的索引不对应
+    - 缺失项目类型相关的核心规范文档
+  comment_contract: >
+    如果项目缺失 docs/agents/ 或核心文档，必须指出这是 Harness Engineering 的规范要求。
+    如果文档没有分层，建议按架构、后端、数据库等维度拆分。
+prompt_hints:
+  load_by_default: true
+  load_when:
+    scopes:
+      - review-architecture
+      - review-module
+    objectives:
+      - documentation
+      - harness-engineering
+governance:
+  admission_decision: keep-in-semantic-review
+  rationale: >
+    需要判断文档分层是否合理、是否覆盖项目核心关注点，
+    这需要理解项目架构和技术栈。
+  evidence_required:
+    - 检查 docs/agents/ 目录结构
+    - 检查核心文档是否存在
+    - 检查文档分层是否合理
+  conflicts_with: []
+  supersedes: []
+  related_rules:
+    - SR-HARNESS-ARCH-001
+    - SR-HARNESS-CONFIG-004

@@ -1,0 +1,66 @@
+schema_version: v1
+id: SR-HARNESS-AGENT-002
+title: Harness Engineering 项目必须包含 .agentignore 文件
+summary: >
+  Harness Engineering 项目必须在根目录包含 .agentignore 文件，
+  用于控制 Agent 能"看到"的文件，防止误操作敏感/基础设施目录。
+owner: review-governance@team
+status: active
+category: semantic-review
+severity: major
+profile_tags:
+  - harness-engineering
+  - security
+  - file-access-control
+applies_to:
+  languages:
+    - any
+  frameworks:
+    - any
+  paths:
+    - "**/.agentignore"
+  package_patterns:
+    - "**/*"
+review:
+  objective: 确保 Harness Engineering 项目具备文件访问控制机制
+  checklist:
+    - .agentignore 必须存在于项目根目录
+    - .agentignore 应该忽略敏感文件（如 .env、密钥文件）
+    - .agentignore 应该忽略基础设施目录（如 terraform/、infrastructure/）
+    - .agentignore 应该忽略生产部署脚本
+    - .agentignore 格式应该类似 .gitignore
+  positive_indicators:
+    - .agentignore 清晰列出敏感目录
+    - .agentignore 包含基础设施目录
+    - .agentignore 格式正确
+  anti_patterns:
+    - 缺失 .agentignore 文件
+    - .agentignore 没有忽略 .env 等敏感文件
+    - .agentignore 没有忽略 infrastructure/ 等目录
+    - .agentignore 格式错误
+  comment_contract: >
+    如果项目缺失 .agentignore，必须指出这是 Harness Engineering 项目的安全要求。
+    如果 .agentignore 遗漏关键敏感目录，应该提醒补充。
+prompt_hints:
+  load_by_default: true
+  load_when:
+    scopes:
+      - review-architecture
+      - review-security
+    objectives:
+      - security
+      - harness-engineering
+governance:
+  admission_decision: keep-in-semantic-review
+  rationale: >
+    需要判断 .agentignore 是否合理覆盖了敏感目录，
+    这需要理解项目的安全边界和基础设施结构。
+  evidence_required:
+    - 检查根目录是否存在 .agentignore
+    - 检查是否忽略 .env 等敏感文件
+    - 检查是否忽略 infrastructure/ 等目录
+  conflicts_with: []
+  supersedes: []
+  related_rules:
+    - SR-HARNESS-ARCH-001
+    - SR-HARNESS-CONFIG-004
