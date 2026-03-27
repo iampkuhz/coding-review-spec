@@ -1,0 +1,31 @@
+{
+  "version": "1.0",
+  "project": "coding-review-spec",
+  "description": "代码审查规约仓库 - Harness Engineering 配置",
+  
+  "tool_profiles": {
+    "default": {
+      "allow": [
+        "file_read",
+        "file_write",
+        "terminal_exec"
+      ],
+      "deny": [
+        "rm -rf",
+        "docker push",
+        "sudo *"
+      ]
+    },
+    "rule-validation": {
+      "allow": [
+        "python3 .agent/hooks/rule_tool.py validate",
+        "python3 .agent/hooks/rule_tool.py select",
+        "python3 .agent/hooks/rule_tool.py explain"
+      ]
+    }
+  },
+  
+  "rules_catalog": ".agent/rules-catalog",
+  "openspec_config": "docs/agents/config.yaml",
+  "docs_root": "docs/agents"
+}

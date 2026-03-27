@@ -1,69 +1,23 @@
-# AGENTS 规范
+# AGENTS.md - 代码审查规约仓库
 
-## 仓库定位
+## 项目概述
 
-本仓库是 **Harness Engineering 规约仓库**，用于：
-- 定义代码审查规则（rules/catalog）
-- 管理规则治理流程（OpenSpec）
-- 提供审查执行工具（harness/review/）
+本仓库是 **Harness Engineering 规约仓库**，用于定义和管理代码审查规则。
 
-**注意**：本仓库不是被审查的目标项目，而是审查规则的来源。
+## 架构描述
 
-## 文档存放规范
+采用 Harness Engineering 标准结构：
+- `.agent/` - 核心配置和规则目录
+- `docs/agents/` - 分层规范文档
 
-### 文档分类
+## 核心 Golden Rules
 
-本仓库的文档分为三类：
+1. 所有审查规则必须存储在 `.agent/rules-catalog/`
+2. 规则治理流程遵循 OpenSpec 规范
+3. 文档分层：给人看的在 `docs/agents/`，给大模型看的也在 `docs/agents/`
 
-1. **给大模型看的文档** - 存放在 `harness/governance/docs/`
-   - 技术实现细节
-   - 工具使用说明
-   - 架构设计文档
+## 目录索引
 
-2. **给人看的永久文档** - 存放在 `handbook/`
-   - 用户手册
-   - 管理指南
-   - 最佳实践
-
-3. **临时生成给人看的文档** - 存放在 `tmp/handbook/`
-   - 临时分析报告
-   - 中间产物
-   - 待确认的文档
-
-### 重要要求
-
-⚠️ **新创建的临时文档必须放到 `tmp/` 文件夹下**
-
-- 给人看的临时文档 → `tmp/handbook/`
-- 给大模型的临时文档 → `tmp/docs/`
-
-只有经过人工确认需要永久保存的文档，才能移入正式的 `handbook/` 或 `harness/governance/docs/` 目录。
-
-### 目录结构
-
-```
-仓库根目录/
-├── handbook/              # 给人看的永久文档
-├── harness/governance/docs/  # 给大模型看的文档
-├── tmp/                   # 临时文档
-│   ├── handbook/          # 临时给人看的文档
-│   └── docs/              # 临时给大模型的文档
-└── AGENTS.md              # 本文件
-```
-
-### 检查清单
-
-在创建新文档时，请确认：
-
-- [ ] 这个文档是给人看的还是给大模型看的？
-- [ ] 这个文档是永久的还是临时的？
-- [ ] 临时文档是否已放到 `tmp/` 目录？
-- [ ] 永久文档是否已放到正确的目录？
-
-## 审查规则
-
-- ✅ 给人看的文档 → `handbook/`
-- ✅ 给大模型看的文档 → `harness/governance/docs/`
-- ✅ 临时给人看的文档 → `tmp/handbook/`
-- ✅ 临时给大模型的文档 → `tmp/docs/`
-- ❌ 禁止在根目录或 `docs/` 下创建临时给人看的文档
+- [规约管理指南](docs/agents/governance-guide.md)
+- [用户手册](docs/agents/user-manual.md)
+- [Harness 项目审查指南](docs/agents/harness-project-guide.md)

@@ -1,0 +1,22 @@
+# Bug 修复流程
+
+## 流程步骤
+
+1. 识别问题规则
+2. 分析规则问题
+3. 修复规则文件
+4. 运行规则校验
+5. 验证修复
+
+## 命令
+
+```bash
+# 1. 解释问题规则
+python3 .agent/hooks/rule_tool.py explain --rule <RULE-ID>
+
+# 2. 修复规则文件
+# 编辑 .agent/rules-catalog/ 下的对应 YAML 文件
+
+# 3. 校验修复
+python3 .agent/hooks/rule_tool.py validate --strict
+```

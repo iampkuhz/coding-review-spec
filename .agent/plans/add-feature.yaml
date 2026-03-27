@@ -1,0 +1,25 @@
+# 新增功能标准流程
+
+## 流程步骤
+
+1. 读取现有规则目录
+2. 设计新功能规则
+3. 创建规则 YAML 文件
+4. 运行规则校验
+5. 更新文档
+
+## 命令
+
+```bash
+# 1. 校验现有规则
+python3 .agent/hooks/rule_tool.py validate --strict
+
+# 2. 选择相关规则（参考）
+python3 .agent/hooks/rule_tool.py select --scope rule-add
+
+# 3. 创建规则文件
+# 在 .agent/rules-catalog/semantic/ 下创建新的 YAML 文件
+
+# 4. 再次校验
+python3 .agent/hooks/rule_tool.py validate --strict
+```

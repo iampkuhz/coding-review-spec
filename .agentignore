@@ -1,0 +1,24 @@
+# Agent 视野控制黑名单
+
+# 忽略敏感文件和目录
+.env
+.env.*
+*.env
+credentials
+secrets/
+
+# 基础设施目录
+infrastructure/
+terraform/
+deploy/
+deployment/
+
+# 生产部署脚本
+prod-deploy*
+production/
+
+# 临时文件
+*.log
+*.tmp
+node_modules/
+__pycache__/
